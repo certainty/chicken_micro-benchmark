@@ -2,6 +2,4 @@
  (author "David Krentzlin")
  (category misc)
  (license "GPLv3")
- (depends)
- (test-depends)
- (foreign-depends))
+ (test-depends test))
