@@ -9,8 +9,9 @@
     (include "common.scm"))
    (macosx
     (include "macos.scm"))
-   ;;windows feature?
-   (else))
+   (win32
+    (include "windows.scm"))
+   (else (error "unsupported platform")))
 
   ;; return the runtime of the given procedure in microseconds
   (define-syntax benchmark-measure
