@@ -2,7 +2,7 @@
   (benchmark-measure benchmark-run %gettime/microsecs current-benchmark-iterations benchmark-compare compare)
 
   (import chicken scheme foreign)
-  (use (only srfi-1 list-tabulate))
+  (use (only srfi-1 list-tabulate) (only data-structures alist-ref))
 
   (cond-expand
    ((or netbsd openbsd freebsd linux)
