@@ -22,6 +22,8 @@
          (set! start (%gettime/microsecs))
          code
          (set! stop (%gettime/microsecs))
+         (if (or (< start 0) (< stop 0))
+             (error "Could not retrieve time reliably"))
          (- stop start)))))
 
   (define current-benchmark-iterations (make-parameter 100))
