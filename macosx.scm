@@ -5,7 +5,7 @@
                                               if( factor == 0.0){
                                                 mach_timebase_info_data_t info;
                                                 mach_timebase_info(&info);
-                                                /* factor to get nanosecs */
+
                                                 factor = (double)info.numer / (double)info.denom;
                                               }
                                               uint64_t time = mach_absolute_time();
