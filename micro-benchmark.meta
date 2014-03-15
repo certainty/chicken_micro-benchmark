@@ -1,0 +1,7 @@
+((synopsis "easily create micro-benchmarks")
+ (author "David Krentzlin")
+ (category misc)
+ (license "GPLv3")
+ (depends)
+ (test-depends)
+ (foreign-depends))
