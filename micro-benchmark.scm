@@ -9,7 +9,7 @@
     (include "common.scm"))
    (macosx
     (include "macos.scm"))
-   (win32
+   ((or mingw32 cygwin)
     (include "windows.scm"))
    (else (error "unsupported platform")))
 
