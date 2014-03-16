@@ -2,7 +2,7 @@
 
 (test-begin "micro-benchmark")
 
-(define epsilon (cond-expand ((or mingw32 cygwin) 0.0001) (else 0.0001)))
+(define epsilon (cond-expand ((or mingw32 cygwin) 0.001) (else 0.0001)))
 (define sleep-time (cond-expand ((or mingw32 cygwin) 2) (else 1)))
 
 (parameterize ((current-test-epsilon epsilon))
