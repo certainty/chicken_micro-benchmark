@@ -1,4 +1,3 @@
-;; get time in microsecond resolution
 (define %gettime/microsecs (foreign-lambda* double ()
                                                     "struct timespec ts;
                                                      if(clock_gettime(CLOCK_MONOTONIC,&ts) < 0){
