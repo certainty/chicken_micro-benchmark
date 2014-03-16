@@ -1,4 +1,4 @@
-(define version "0.0.1")
+(define version "0.0.2")
 
 (compile -d0 -O2 -J -s -S micro-benchmark.scm)
 (compile -d0 -O2 -s micro-benchmark.import.scm)
