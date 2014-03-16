@@ -1,18 +1,18 @@
-;; get time in microsecond resolution
 (foreign-declare "#include<windows.h>")
-(define %gettime/microsecs (foreign-lambda* double ()
-                                            " static double factor = 0.0;
-                                              LARGE_INTEGER li;
+(define %factor ((foreign-lambda* double ()
+                                   "LARGE_INTEGER li;
+                                    if(!QueryPerformanceFrequency(&li)){
+                                       C_return(-1.0);
+                                    }
+                                    C_return((double)li.QuadPart/1000000.0);"
+                                   )))
+(when (< %factor 0.0) (error "Could not determine scale factor"))
 
-                                              if(factor ==  0.0){
-                                                 if(!QueryPerformanceFrequency(&li)){
-                                                   C_return(-1.0);
-                                                 }
-
-                                                 factor = double(li.QuadPart)/1000000.0;
-                                              }
-                                              if(!QueryPerformanceCounter(&li)){
-                                                C_return(-1.0);
-                                              }
-                                              C_return((double)li.QuadPart / factor);
-                                            "))
+(define (%gettime/microsecs)
+  (let ((time ((foreign-lambda* double ()
+                                 "LARGE_INTEGER li;
+                                  if(!QueryPerformanceCounter(&li)){
+                                    C_return(-1.0);
+                                  }
+                                  C_return((double)li.QuadPart);"))))
+    (/ time %factor)))
