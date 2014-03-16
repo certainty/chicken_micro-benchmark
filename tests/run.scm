@@ -2,20 +2,19 @@
 
 (test-begin "micro-benchmark")
 
-(define epsilon    (cond-expand ((or mingw32 cygwin) 0.001) (else 0.0001)))
-(define sleep-time (cond-expand ((or mingw32 cygwin) 2) (else 1)))
+;; (sleep i) seems to actually sleep i-1 seconds on windows so if you see the tests failing it's probably because of this
 
-(parameterize ((current-test-epsilon epsilon))
+(parameterize ((current-test-epsilon 0.001))
   (test "benchmark-measure"
-        (* sleep-time 1000000.0)
-        (benchmark-measure (sleep sleep-time)))
+        1000000.0
+        (benchmark-measure (sleep 1)))
   (test-group "benchmark-run"
-              (let ((result (parameterize ((current-benchmark-iterations 3)) (benchmark-run (sleep sleep-time)))))
+              (let ((result (parameterize ((current-benchmark-iterations 3)) (benchmark-run (sleep 1)))))
                 (test "min"
-                      (* sleep-time 1000000.0)
+                      1000000.0
                       (alist-ref 'min result))
                 (test "max"
-                      (* sleep-time 1000000.0)
+                      1000000.0
                       (alist-ref 'max result))
                 (test "runtimes"
                       3
