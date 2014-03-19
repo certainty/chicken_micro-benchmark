@@ -13,18 +13,16 @@
     (include "windows.scm"))
    (else (error "unsupported platform")))
 
-  ;; return the runtime of the given procedure in microseconds
+  ;; returns a pair holding the runtime and the result of the invokation of code
   (define-syntax benchmark-measure
     (syntax-rules ()
       ((_  ?code)
-       (let ((start  0)
-             (stop   0))
-         (set! start (%gettime/microsecs))
-         ?code
-         (set! stop (%gettime/microsecs))
-         (if (or (< start 0) (< stop 0))
+       (let ((start  (%gettime/microsecs))
+             (result ?code)
+             (stop   (%gettime/microsecs)))
+         (if (or (< start 0.0) (< stop 0.0))
              (error "Could not retrieve time reliably"))
-         (- stop start)))))
+         (cons (- stop start) result)))))
 
   (define current-benchmark-iterations (make-parameter 100))
 
@@ -34,16 +32,20 @@
   ;; * min - minimum runtime
   ;; * avg - average runtime
   ;; * runtimes - list of all runtimes
+  ;; * values  - the results of all procedure invokations
   (define-syntax benchmark-run
     (syntax-rules ()
       ((_ ?code)
        (benchmark-run (current-benchmark-iterations) ?code))
       ((_ ?iterations ?code)
-       (let ((runtimes (list-tabulate ?iterations (lambda _ (benchmark-measure ?code)))))
+       (let* ((result (map (lambda _ (benchmark-measure ?code)) (iota ?iterations)))
+              (runtimes (map car result))
+              (results  (map cdr result)))
          `((max . ,(apply max runtimes))
            (min . ,(apply min runtimes))
-           (avg . ,(/ (fold + 0 runtimes) (length runtimes)))
-           (runtimes . ,runtimes))))))
+           (avg . ,(/ (apply + runtimes) (length runtimes)))
+           (runtimes . ,runtimes)
+           (values . ,results))))))
 
   (define (compare x y)
     (cond
