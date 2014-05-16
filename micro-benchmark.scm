@@ -1,5 +1,5 @@
 (module micro-benchmark
-  (benchmark-measure benchmark-run %gettime/microsecs current-benchmark-iterations benchmark-compare compare)
+  (benchmark-measure benchmark-run %gettime/microsecs current-benchmark-iterations benchmark-compare compare generate-statistics)
 
   (import chicken scheme foreign)
   (use (only srfi-1 list-tabulate) (only data-structures alist-ref))
@@ -22,30 +22,25 @@
              (stop   (%gettime/microsecs)))
          (if (or (< start 0.0) (< stop 0.0))
              (error "Could not retrieve time reliably"))
-         (cons (- stop start) result)))))
+         (- stop start)))))
 
   (define current-benchmark-iterations (make-parameter 100))
 
   ;; run the given procedure n times and return statistics about the runtime
-  ;; returns an alist with
-  ;; * max - maximum runtime
-  ;; * min - minimum runtime
-  ;; * avg - average runtime
-  ;; * runtimes - list of all runtimes
-  ;; * values  - the results of all procedure invokations
+  ;; returns an alist with statistics
   (define-syntax benchmark-run
     (syntax-rules ()
       ((_ ?code)
        (benchmark-run (current-benchmark-iterations) ?code))
       ((_ ?iterations ?code)
-       (let* ((result (map (lambda _ (benchmark-measure ?code)) (iota ?iterations)))
-              (runtimes (map car result))
-              (results  (map cdr result)))
-         `((max . ,(apply max runtimes))
-           (min . ,(apply min runtimes))
-           (avg . ,(/ (apply + runtimes) (length runtimes)))
-           (runtimes . ,runtimes)
-           (values . ,results))))))
+       (let ((runtimes (map (lambda _ (benchmark-measure ?code)) (iota ?iterations))))
+         (generate-statistics runtimes)))))
+
+  (define (generate-statistics runtimes)
+    `((max . ,(apply max runtimes))
+      (min . ,(apply min runtimes))
+      (avg . ,(/ (apply + runtimes) (length runtimes)))
+      (runtimes . ,runtimes)))
 
   (define (compare x y)
     (cond
