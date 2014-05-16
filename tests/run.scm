@@ -17,9 +17,9 @@
                 (test "max"
                       1000000.0
                       (alist-ref 'max result))
-                (test "runtimes"
-                      3
-                      (length (alist-ref 'runtimes result))))))
+                (test "mean"
+                      1000000.0
+                      (alist-ref 'mean result)))))
 
 (test-end "micro-benchmark")
 (test-exit)
