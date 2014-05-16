@@ -1,8 +1,8 @@
 (module micro-benchmark
-  (benchmark-measure benchmark-run %gettime/microsecs current-benchmark-iterations benchmark-compare compare generate-statistics)
+  (benchmark-measure benchmark-run %gettime/microsecs current-benchmark-iterations generate-statistics)
 
   (import chicken scheme foreign)
-  (use (only srfi-1 list-tabulate) (only data-structures alist-ref))
+  (use (only srfi-1 list-tabulate fold) (only data-structures alist-ref))
 
   (cond-expand
    ((or netbsd openbsd freebsd linux)
@@ -13,7 +13,6 @@
     (include "windows.scm"))
    (else (error "unsupported platform")))
 
-  ;; returns a pair holding the runtime and the result of the invokation of code
   (define-syntax benchmark-measure
     (syntax-rules ()
       ((_  ?code)
@@ -36,27 +35,24 @@
        (let ((runtimes (map (lambda _ (benchmark-measure ?code)) (iota ?iterations))))
          (generate-statistics runtimes)))))
 
+
+  ;; should we also add percentiles to give a pointer on what to improve?
+  ;; like the 95%?
   (define (generate-statistics runtimes)
-    `((max . ,(apply max runtimes))
-      (min . ,(apply min runtimes))
-      (avg . ,(/ (apply + runtimes) (length runtimes)))
-      (runtimes . ,runtimes)))
+    (let ((m (mean runtimes)))
+      `((max  . ,(apply max runtimes))
+        (min  . ,(apply min runtimes))
+        (mean . ,m)
+        (standard-deviation . ,(sample-standard-deviation runtimes m)))))
 
-  (define (compare x y)
-    (cond
-     ((= x y) 0)
-     ((< x y) -1)
-     ((> x y) 1)))
+  (define (mean values)
+    (/ (apply + values) (length values)))
 
-  (define-syntax benchmark-compare
-    (syntax-rules ()
-      ((_ ?code-a ?code-b)
-       (benchmark-compare (current-benchmark-iterations) ?code-a ?code-b))
-      ((_ ?iterations ?code-a ?code-b)
-       (let* ((result-a (benchmark-run ?code-a))
-              (result-b (benchmark-run ?code-b))
-              (avg-a (alist-ref result-a 'avg))
-              (avg-b (alist-ref resutl-b 'avg)))
-         (values (compare avg-a avg-b) result-a result-b)))))
+  (define (sample-standard-deviation values #!optional (m (mean values)))
+    (sqrt (/ (fold (lambda (elt acc)
+                     (+ acc (expt (- elt m) 2)))
+                   0 values)
+             (- (length values) 1))))
 
-)
+
+  )
