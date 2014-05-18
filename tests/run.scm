@@ -19,7 +19,12 @@
                       (alist-ref 'max result))
                 (test "mean"
                       1000000.0
-                      (alist-ref 'mean result)))))
+                      (alist-ref 'mean result))
+                (test "deviation for a single result"
+                      0.0
+                      (alist-ref 'standard-deviation (benchmark-run 1 #f)))
+
+                )))
 
 (test-end "micro-benchmark")
 (test-exit)

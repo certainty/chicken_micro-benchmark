@@ -1,5 +1,7 @@
 (foreign-declare "#include<mach/mach_time.h>")
 
+;; we immediatly determine the factor
+;; it should not change as long as the machine runs
 (define %factor ((foreign-lambda* double ()
                                   "mach_timebase_info_data_t info;
                                    mach_timebase_info(&info);
