@@ -24,8 +24,8 @@
          (- stop start)))))
 
   (define current-benchmark-iterations (make-parameter 100 (lambda (x)
-                                                             (if (< x 2)
-                                                                 (error "You need at least 2 benchmark iterations")
+                                                             (if (negative? x)
+                                                                 (error "You can not have a negative amount of benchmark iterations")
                                                                  x))))
 
   ;; run the given procedure n times and return statistics about the runtime
@@ -53,9 +53,6 @@
 
   (define (sample-variance values #!optional (m (mean values)))
     (let ((amount (length values)))
-      (unless (> amount 1)
-        (error "Can not compute sample variance of less than 2 values"))
-
       (/ (fold (lambda (elt acc)
                  (+ acc (expt (- elt m) 2)))
                0
@@ -63,6 +60,9 @@
          (- amount 1))))
 
   (define (sample-standard-deviation values #!optional (m (mean values)))
-    (sqrt (sample-variance values m)))
+    (let ((sample-size (length values)))
+      (if (<= 0 sample-size 1)
+          0.0
+          (sqrt (sample-variance values m)))))
 
   )
