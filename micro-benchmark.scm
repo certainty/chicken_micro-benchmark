@@ -113,7 +113,8 @@
             (loop (fx+ iterations per-100ms) (cons (- after before) timings))))
          (else
           (let ((all-ips (map (lambda (i) (/ per-100ms (/ i 1000.0))) timings)))
-            (generate-statistics all-ips)))))))
+            `((mean . ,(mean all-ips))
+              (standard-deviation . ,(sample-standard-deviation all-ips)))))))))
 
 
 
