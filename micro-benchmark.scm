@@ -86,6 +86,7 @@
            ?code ...
            (loop (fx- n 1)))))))
 
+  (: iterations-per-100ms (procedure fixnum -> (pair fixnum fixnum)))
   (define (iterations-per-100ms thunk limit)
     (let ((before (current-milliseconds))
           (threshold (+ limit (current-milliseconds))))
